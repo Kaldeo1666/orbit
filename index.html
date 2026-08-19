@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orbit — Habits & Focus</title>
+<meta name="description" content="Orbit: a habit tracker and Eisenhower-matrix to-do app.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- Ambient background -->
+<div class="orbit-field" aria-hidden="true">
+  <div class="orb orb-a"></div>
+  <div class="orb orb-b"></div>
+  <div class="grain"></div>
+</div>
+
+<div class="app-shell">
+
+  <!-- Sidebar -->
+  <aside class="rail">
+    <div class="rail-brand">
+      <span class="rail-brand-mark">◍</span>
+      <span class="rail-brand-name">Orbit</span>
+    </div>
+
+    <nav class="rail-nav" role="tablist" aria-label="Main sections">
+      <button class="rail-tab is-active" data-view="dashboard" role="tab" aria-selected="true">
+        <span class="rail-tab-icon">⟐</span>
+        <span class="rail-tab-label">Dashboard</span>
+      </button>
+      <button class="rail-tab" data-view="tasks" role="tab" aria-selected="false">
+        <span class="rail-tab-icon">▤</span>
+        <span class="rail-tab-label">Tasks</span>
+      </button>
+      <button class="rail-tab" data-view="habits" role="tab" aria-selected="false">
+        <span class="rail-tab-icon">◉</span>
+        <span class="rail-tab-label">Habits</span>
+      </button>
+    </nav>
+
+    <div class="rail-footer">
+      <div class="rail-date" id="railDate">—</div>
+      <div class="rail-quote" id="railQuote">Small orbits, sustained.</div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="stage">
+
+    <!-- ============ DASHBOARD ============ -->
+    <section class="view is-active" id="view-dashboard" data-view-panel="dashboard">
+      <header class="stage-head">
+        <div>
+          <p class="stage-eyebrow">Today</p>
+          <h1 class="stage-title" id="greeting">Good day.</h1>
+        </div>
+      </header>
+
+      <div class="dash-grid">
+        <div class="card card-stat" data-stat="tasksDue">
+          <p class="card-label">Do First today</p>
+          <p class="card-number" id="statUrgentImportant">0</p>
+          <p class="card-sub">urgent &amp; important</p>
+        </div>
+        <div class="card card-stat" data-stat="habitsToday">
+          <p class="card-label">Habits checked</p>
+          <p class="card-number"><span id="statHabitsDone">0</span><span class="card-number-of">/<span id="statHabitsTotal">0</span></span></p>
+          <p class="card-sub">completed today</p>
+        </div>
+        <div class="card card-stat" data-stat="streak">
+          <p class="card-label">Best streak</p>
+          <p class="card-number" id="statBestStreak">0</p>
+          <p class="card-sub">days running</p>
+        </div>
+        <div class="card card-stat" data-stat="rate">
+          <p class="card-label">7-day consistency</p>
+          <p class="card-number"><span id="statWeekRate">0</span><span class="card-number-of">%</span></p>
+          <p class="card-sub">across all habits</p>
+        </div>
+      </div>
+
+      <div class="dash-lower">
+        <div class="card card-panel">
+          <div class="card-panel-head">
+            <h2>Weekly rhythm</h2>
+            <p>Habit completions, last 7 days</p>
+          </div>
+          <div class="chart-wrap"><canvas id="weeklyChart"></canvas></div>
+        </div>
+
+        <div class="card card-panel">
+          <div class="card-panel-head">
+            <h2>Eisenhower snapshot</h2>
+            <p>Open tasks by quadrant</p>
+          </div>
+          <div class="chart-wrap chart-wrap-donut"><canvas id="quadrantChart"></canvas></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ TASKS ============ -->
+    <section class="view" id="view-tasks" data-view-panel="tasks">
+      <header class="stage-head">
+        <div>
+          <p class="stage-eyebrow">Tasks</p>
+          <h1 class="stage-title">What matters, in order.</h1>
+        </div>
+        <div class="seg" role="tablist" aria-label="Task view mode">
+          <button class="seg-btn is-active" data-taskview="matrix">Matrix</button>
+          <button class="seg-btn" data-taskview="list">List</button>
+        </div>
+      </header>
+
+      <form class="composer" id="taskComposer">
+        <input type="text" id="taskInput" class="composer-input" placeholder="Add a task… e.g. Reply to Priya about the mockups" autocomplete="off" required maxlength="140">
+        <div class="composer-select" id="quadrantPicker">
+          <button type="button" class="qpick qpick-do is-active" data-q="do" title="Urgent & Important">Do</button>
+          <button type="button" class="qpick qpick-schedule" data-q="schedule" title="Important, not urgent">Schedule</button>
+          <button type="button" class="qpick qpick-delegate" data-q="delegate" title="Urgent, not important">Delegate</button>
+          <button type="button" class="qpick qpick-delete" data-q="delete" title="Neither">Eliminate</button>
+        </div>
+        <button type="submit" class="composer-submit">Add<span class="composer-submit-icon">+</span></button>
+      </form>
+
+      <!-- Matrix view -->
+      <div class="matrix" id="matrixView">
+        <div class="matrix-axis matrix-axis-top" aria-hidden="true">Urgent</div>
+        <div class="matrix-axis matrix-axis-left" aria-hidden="true">Important</div>
+
+        <div class="quad quad-do" data-quadrant="do">
+          <div class="quad-head">
+            <span class="quad-tag">Do First</span>
+            <span class="quad-hint">urgent · important</span>
+          </div>
+          <ul class="quad-list" data-dropzone="do"></ul>
+        </div>
+
+        <div class="quad quad-schedule" data-quadrant="schedule">
+          <div class="quad-head">
+            <span class="quad-tag">Schedule</span>
+            <span class="quad-hint">not urgent · important</span>
+          </div>
+          <ul class="quad-list" data-dropzone="schedule"></ul>
+        </div>
+
+        <div class="quad quad-delegate" data-quadrant="delegate">
+          <div class="quad-head">
+            <span class="quad-tag">Delegate</span>
+            <span class="quad-hint">urgent · not important</span>
+          </div>
+          <ul class="quad-list" data-dropzone="delegate"></ul>
+        </div>
+
+        <div class="quad quad-delete" data-quadrant="delete">
+          <div class="quad-head">
+            <span class="quad-tag">Eliminate</span>
+            <span class="quad-hint">not urgent · not important</span>
+          </div>
+          <ul class="quad-list" data-dropzone="delete"></ul>
+        </div>
+      </div>
+
+      <!-- List view -->
+      <ul class="task-list" id="listView" hidden></ul>
+
+      <p class="empty-note" id="tasksEmptyNote" hidden>Nothing here yet — add your first task above.</p>
+    </section>
+
+    <!-- ============ HABITS ============ -->
+    <section class="view" id="view-habits" data-view-panel="habits">
+      <header class="stage-head">
+        <div>
+          <p class="stage-eyebrow">Habits</p>
+          <h1 class="stage-title">Show up, then show up again.</h1>
+        </div>
+      </header>
+
+      <form class="composer" id="habitComposer">
+        <input type="text" id="habitInput" class="composer-input" placeholder="New habit… e.g. Read 20 minutes" autocomplete="off" required maxlength="60">
+        <div class="composer-select" id="colorPicker">
+          <button type="button" class="cpick is-active" data-color="teal" style="--c: #5EEAD4"></button>
+          <button type="button" class="cpick" data-color="amber" style="--c: #F5A623"></button>
+          <button type="button" class="cpick" data-color="rose" style="--c: #FB7185"></button>
+          <button type="button" class="cpick" data-color="violet" style="--c: #A78BFA"></button>
+          <button type="button" class="cpick" data-color="sky" style="--c: #7DD3FC"></button>
+        </div>
+        <button type="submit" class="composer-submit">Add<span class="composer-submit-icon">+</span></button>
+      </form>
+
+      <div class="habit-list" id="habitList"></div>
+
+      <p class="empty-note" id="habitsEmptyNote" hidden>No habits yet — add one above to start your first streak.</p>
+    </section>
+
+  </main>
+</div>
+
+<!-- Habit detail drawer -->
+<div class="drawer-backdrop" id="drawerBackdrop"></div>
+<aside class="drawer" id="habitDrawer" aria-hidden="true">
+  <div class="drawer-head">
+    <h2 id="drawerHabitName">Habit</h2>
+    <button class="drawer-close" id="drawerClose" aria-label="Close">✕</button>
+  </div>
+  <div class="drawer-stats">
+    <div><span id="drawerStreak">0</span><small>current streak</small></div>
+    <div><span id="drawerBest">0</span><small>best streak</small></div>
+    <div><span id="drawerRate">0%</span><small>90-day rate</small></div>
+  </div>
+  <div class="heatmap-wrap">
+    <div class="heatmap" id="heatmap"></div>
+  </div>
+  <div class="chart-wrap chart-wrap-small"><canvas id="habitTrendChart"></canvas></div>
+  <button class="drawer-danger" id="drawerDelete">Delete this habit</button>
+</aside>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="js/store.js"></script>
+<script src="js/tasks.js"></script>
+<script src="js/habits.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

@@ -287,6 +287,55 @@ body{
 .empty-note{ text-align:center; color: var(--ink-faint); font-size:13.5px; padding: 40px 0; }
 
 /* ============================================================
+   Completed archive (collapsible tray)
+   ============================================================ */
+.archive{
+  margin-top: 28px; border-top: 1px solid var(--border); padding-top: 6px;
+}
+.archive-head{
+  width:100%; display:flex; align-items:center; gap:10px;
+  background: none; border:none; cursor:pointer; padding: 12px 4px;
+  color: var(--ink-dim); font-family: var(--font-body);
+}
+.archive-chevron{ font-size:11px; color: var(--ink-faint); transition: transform .3s var(--ease-spring); display:inline-block; }
+.archive[data-open="true"] .archive-chevron{ transform: rotate(90deg); }
+.archive-title{ font-size:13.5px; font-weight:600; color: var(--ink); }
+.archive-count{
+  font-family: var(--font-mono); font-size:11px; background: var(--surface-hi);
+  border:1px solid var(--border); border-radius:20px; padding:2px 9px; color: var(--ink-dim);
+}
+.archive-clear-wrap{ margin-left:auto; }
+.archive-clear{
+  font-size:12px; color: var(--ink-faint); padding:5px 10px; border-radius:20px;
+  transition: all .2s var(--ease);
+}
+.archive-clear:hover{ color: var(--rose); background: var(--rose-dim); }
+
+.archive-body{
+  display:grid; grid-template-rows: 0fr; transition: grid-template-rows .35s var(--ease);
+}
+.archive[data-open="true"] .archive-body{ grid-template-rows: 1fr; }
+.archive-body > .archive-list{ overflow:hidden; }
+
+.archive-list{ list-style:none; display:flex; flex-direction:column; gap:6px; padding-top:8px; }
+.archive-item{
+  display:flex; align-items:center; gap:10px;
+  background: rgba(255,255,255,0.02); border:1px solid var(--border); border-radius: var(--r-sm);
+  padding: 9px 12px; opacity:.7; animation: pop-in .3s var(--ease-spring) both;
+  transition: opacity .2s var(--ease), background .2s var(--ease);
+}
+.archive-item:hover{ opacity:1; background: rgba(255,255,255,0.04); }
+.archive-item-text{ flex:1; font-size:13px; text-decoration: line-through; color: var(--ink-faint); word-break: break-word; }
+.archive-item-restore{
+  background:none; border:1px solid var(--border); border-radius:20px; color: var(--ink-dim);
+  font-size:11px; padding:4px 10px; cursor:pointer; flex-shrink:0; transition: all .2s var(--ease);
+}
+.archive-item-restore:hover{ color: var(--teal); border-color: var(--teal); }
+.archive-item-del{ background:none; border:none; color: var(--ink-faint); cursor:pointer; font-size:15px; flex-shrink:0; }
+.archive-item-del:hover{ color: var(--rose); }
+.archive-empty{ font-size:12.5px; color: var(--ink-faint); font-style:italic; padding: 10px 4px 4px; }
+
+/* ============================================================
    Habits
    ============================================================ */
 .habit-list{ display:flex; flex-direction:column; gap:10px; }

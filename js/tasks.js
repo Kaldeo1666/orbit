@@ -72,7 +72,13 @@ const Tasks = (() => {
 
     li.querySelector('.task-check').addEventListener('click', (e) => {
       e.stopPropagation();
-      toggleDone(t.id);
+      if (!t.done){
+        // completing: animate the card out before it drops into the archive
+        li.classList.add('is-removing');
+        setTimeout(() => toggleDone(t.id), 240);
+      } else {
+        toggleDone(t.id);
+      }
     });
     li.querySelector('.task-del').addEventListener('click', (e) => {
       e.stopPropagation();
@@ -99,12 +105,14 @@ const Tasks = (() => {
   }
 
   function render(){
-    // Matrix view
+    const open = tasks.filter(t => !t.done);
+
+    // Matrix view — only active (not-done) tasks; completed ones drop into the archive
     QUADRANTS.forEach(q => {
       const list = document.querySelector(`.quad-list[data-dropzone="${q}"]`);
       if (!list) return;
       list.innerHTML = '';
-      const items = tasks.filter(t => t.quadrant === q);
+      const items = open.filter(t => t.quadrant === q);
       if (items.length === 0){
         const p = document.createElement('p');
         p.className = 'quad-empty';
@@ -115,15 +123,74 @@ const Tasks = (() => {
       }
     });
 
-    // List view
+    // List view — also active-only, newest first
     const listView = document.getElementById('listView');
     if (listView){
       listView.innerHTML = '';
-      const sorted = [...tasks].sort((a,b) => a.done - b.done || b.createdAt - a.createdAt);
+      const sorted = [...open].sort((a,b) => b.createdAt - a.createdAt);
       sorted.forEach(t => listView.appendChild(buildListCard(t)));
     }
 
     document.getElementById('tasksEmptyNote').hidden = tasks.length > 0;
+    renderArchive();
+  }
+
+  function renderArchive(){
+    const done = tasks.filter(t => t.done).sort((a,b) => b.createdAt - a.createdAt);
+    const archive = document.getElementById('archive');
+    const list = document.getElementById('archiveList');
+    const count = document.getElementById('archiveCount');
+    if (!archive || !list) return;
+
+    count.textContent = done.length;
+    list.innerHTML = '';
+
+    if (done.length === 0){
+      const p = document.createElement('p');
+      p.className = 'archive-empty';
+      p.textContent = 'Nothing completed yet — checked-off tasks land here.';
+      list.appendChild(p);
+      return;
+    }
+
+    done.forEach(t => {
+      const li = document.createElement('li');
+      li.className = 'archive-item';
+      li.innerHTML = `
+        <span class="archive-item-text"></span>
+        <button class="archive-item-restore" type="button">Restore</button>
+        <button class="archive-item-del" type="button" aria-label="Delete permanently">×</button>
+      `;
+      li.querySelector('.archive-item-text').textContent = t.text;
+      li.querySelector('.archive-item-restore').addEventListener('click', () => toggleDone(t.id));
+      li.querySelector('.archive-item-del').addEventListener('click', () => remove(t.id));
+      list.appendChild(li);
+    });
+  }
+
+  function setupArchive(){
+    const archive = document.getElementById('archive');
+    const toggle = document.getElementById('archiveToggle');
+    const clearBtn = document.getElementById('archiveClear');
+
+    toggle.addEventListener('click', () => {
+      const isOpen = archive.dataset.open === 'true';
+      archive.dataset.open = String(!isOpen);
+      toggle.setAttribute('aria-expanded', String(!isOpen));
+    });
+
+    clearBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const doneCount = tasks.filter(t => t.done).length;
+      if (doneCount === 0) return;
+      tasks = tasks.filter(t => !t.done);
+      persist();
+      render();
+      if (window.App) App.toast('Cleared ' + doneCount + ' completed task' + (doneCount===1?'':'s'));
+    });
+    clearBtn.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); clearBtn.click(); }
+    });
   }
 
   function setupDragTargets(){
@@ -180,6 +247,7 @@ const Tasks = (() => {
     setupComposer();
     setupDragTargets();
     setupViewToggle();
+    setupArchive();
     document.getElementById('listView').hidden = true;
     render();
   }

@@ -171,6 +171,21 @@
       <ul class="task-list" id="listView" hidden></ul>
 
       <p class="empty-note" id="tasksEmptyNote" hidden>Nothing here yet — add your first task above.</p>
+
+      <!-- Completed archive -->
+      <div class="archive" id="archive" data-open="false">
+        <button type="button" class="archive-head" id="archiveToggle" aria-expanded="false">
+          <span class="archive-chevron">▸</span>
+          <span class="archive-title">Completed</span>
+          <span class="archive-count" id="archiveCount">0</span>
+          <span class="archive-clear-wrap">
+            <span class="archive-clear" id="archiveClear" role="button" tabindex="0">Clear all</span>
+          </span>
+        </button>
+        <div class="archive-body">
+          <ul class="archive-list" id="archiveList"></ul>
+        </div>
+      </div>
     </section>
 
     <!-- ============ HABITS ============ -->

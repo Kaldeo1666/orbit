@@ -1,5 +1,8 @@
 /* ============================================================
-   tasks.js — to-do list + Eisenhower matrix
+   tasks.js — to-do list + Eisenhower matrix + completed archive
+   Tasks can optionally carry a `date` (YYYY-MM-DD) and `order`
+   field, which is how the Calendar view hooks into the same
+   underlying list — a calendar task IS a task, just scheduled.
    ============================================================ */
 const Tasks = (() => {
   let tasks = Store.getTasks();
@@ -11,13 +14,39 @@ const Tasks = (() => {
 
   const checkIcon = `<svg viewBox="0 0 16 16" fill="none"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
-  function persist(){ Store.setTasks(tasks); if (window.App) App.refreshDashboard(); }
+  function persist(){
+    Store.setTasks(tasks);
+    if (window.App) App.refreshDashboard();
+    if (window.Calendar) Calendar.render();
+  }
 
   function add(text, quadrant){
-    const t = { id: Store.uid(), text: text.trim(), quadrant, done: false, createdAt: Date.now() };
+    const t = { id: Store.uid(), text: text.trim(), quadrant, done: false, createdAt: Date.now(), date: null, order: 0 };
     tasks.unshift(t);
     persist();
     render();
+  }
+
+  function addForDate(text, quadrant, dateStr){
+    const existing = tasks.filter(t => t.date === dateStr);
+    const maxOrder = existing.reduce((m,t) => Math.max(m, t.order||0), -1);
+    const t = { id: Store.uid(), text: text.trim(), quadrant, done: false, createdAt: Date.now(), date: dateStr, order: maxOrder + 1 };
+    tasks.unshift(t);
+    persist();
+    render();
+    return t;
+  }
+
+  function forDate(dateStr){
+    return tasks.filter(t => t.date === dateStr && !t.done).sort((a,b) => (a.order||0) - (b.order||0));
+  }
+
+  function reorderDate(dateStr, orderedIds){
+    orderedIds.forEach((id, i) => {
+      const t = tasks.find(x => x.id === id);
+      if (t) t.order = i;
+    });
+    persist();
   }
 
   function toggleDone(id){
@@ -73,7 +102,6 @@ const Tasks = (() => {
     li.querySelector('.task-check').addEventListener('click', (e) => {
       e.stopPropagation();
       if (!t.done){
-        // completing: animate the card out before it drops into the archive
         li.classList.add('is-removing');
         setTimeout(() => toggleDone(t.id), 240);
       } else {
@@ -101,13 +129,18 @@ const Tasks = (() => {
     pill.className = `task-pill task-pill-${t.quadrant}`;
     pill.textContent = QUAD_LABEL[t.quadrant];
     li.insertBefore(pill, li.querySelector('.task-del'));
+    if (t.date){
+      const d = document.createElement('span');
+      d.className = 'task-date-badge';
+      d.textContent = t.date.slice(5).replace('-', '/');
+      li.insertBefore(d, li.querySelector('.task-del'));
+    }
     return li;
   }
 
   function render(){
     const open = tasks.filter(t => !t.done);
 
-    // Matrix view — only active (not-done) tasks; completed ones drop into the archive
     QUADRANTS.forEach(q => {
       const list = document.querySelector(`.quad-list[data-dropzone="${q}"]`);
       if (!list) return;
@@ -123,7 +156,6 @@ const Tasks = (() => {
       }
     });
 
-    // List view — also active-only, newest first
     const listView = document.getElementById('listView');
     if (listView){
       listView.innerHTML = '';
@@ -252,5 +284,10 @@ const Tasks = (() => {
     render();
   }
 
-  return { init, counts, get all(){ return tasks; } };
+  return {
+    init, render, counts,
+    add, addForDate, forDate, reorderDate, toggleDone, remove, move,
+    quadLabel: QUAD_LABEL,
+    get all(){ return tasks; },
+  };
 })();

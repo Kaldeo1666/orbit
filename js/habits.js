@@ -44,7 +44,6 @@ const Habits = (() => {
   function currentStreak(h){
     let streak = 0;
     let cursor = Store.todayStr();
-    // if today not done yet, streak counts back from yesterday but only if yesterday was done
     if (!h.log[cursor]) {
       cursor = addDays(cursor, -1);
     }
@@ -164,7 +163,6 @@ const Habits = (() => {
     document.getElementById('drawerBest').textContent = bestStreak(h);
     document.getElementById('drawerRate').textContent = rateOverDays(h, 90) + '%';
 
-    // heatmap: last 98 days (14 weeks), oldest-to-newest, columns = weeks
     const heatmap = document.getElementById('heatmap');
     heatmap.innerHTML = '';
     const days = 98;

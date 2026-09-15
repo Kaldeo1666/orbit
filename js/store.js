@@ -4,6 +4,7 @@
 const Store = (() => {
   const TASKS_KEY = 'orbit.tasks.v1';
   const HABITS_KEY = 'orbit.habits.v1';
+  const CAL_ANCHOR_KEY = 'orbit.calendarAnchor.v1';
 
   function read(key, fallback){
     try{
@@ -40,11 +41,19 @@ const Store = (() => {
     return todayStr(d);
   }
 
+  function daysBetween(fromStr, toStr){
+    const a = new Date(fromStr + 'T00:00:00');
+    const b = new Date(toStr + 'T00:00:00');
+    return Math.round((b - a) / 86400000);
+  }
+
   return {
-    uid, todayStr, addDays,
+    uid, todayStr, addDays, daysBetween,
     getTasks: () => read(TASKS_KEY, []),
     setTasks: (t) => write(TASKS_KEY, t),
     getHabits: () => read(HABITS_KEY, []),
     setHabits: (h) => write(HABITS_KEY, h),
+    getCalAnchor: () => read(CAL_ANCHOR_KEY, null),
+    setCalAnchor: (d) => write(CAL_ANCHOR_KEY, d),
   };
 })();

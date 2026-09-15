@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Orbit — Habits & Focus</title>
 <meta name="description" content="Orbit: a habit tracker and Eisenhower-matrix to-do app.">
+<meta name="theme-color" content="#0A0E17">
+
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/icons/favicon-16.png">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -38,6 +44,10 @@
       <button class="rail-tab" data-view="tasks" role="tab" aria-selected="false">
         <span class="rail-tab-icon">▤</span>
         <span class="rail-tab-label">Tasks</span>
+      </button>
+      <button class="rail-tab" data-view="calendar" role="tab" aria-selected="false">
+        <span class="rail-tab-icon">▦</span>
+        <span class="rail-tab-label">Calendar</span>
       </button>
       <button class="rail-tab" data-view="habits" role="tab" aria-selected="false">
         <span class="rail-tab-icon">◉</span>
@@ -188,6 +198,24 @@
       </div>
     </section>
 
+    <!-- ============ CALENDAR ============ -->
+    <section class="view" id="view-calendar" data-view-panel="calendar">
+      <header class="stage-head">
+        <div>
+          <p class="stage-eyebrow">Calendar</p>
+          <h1 class="stage-title">This week, day by day.</h1>
+        </div>
+        <div class="cal-nav">
+          <button type="button" class="cal-arrow" id="calPrev" aria-label="Previous week">‹</button>
+          <button type="button" class="cal-today" id="calToday">Today</button>
+          <span class="cal-range" id="calRange">—</span>
+          <button type="button" class="cal-arrow" id="calNext" aria-label="Next week">›</button>
+        </div>
+      </header>
+
+      <div class="cal-grid" id="calGrid"></div>
+    </section>
+
     <!-- ============ HABITS ============ -->
     <section class="view" id="view-habits" data-view-panel="habits">
       <header class="stage-head">
@@ -242,6 +270,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <script src="js/store.js"></script>
 <script src="js/tasks.js"></script>
+<script src="js/calendar.js"></script>
 <script src="js/habits.js"></script>
 <script src="js/charts.js"></script>
 <script src="js/app.js"></script>

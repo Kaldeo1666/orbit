@@ -94,7 +94,6 @@ const Charts = (() => {
     const ctx = document.getElementById('habitTrendChart');
     if (!ctx) return;
     const today = Store.todayStr();
-    // build 10 weekly buckets of completion rate (oldest to newest)
     const buckets = [];
     for (let w = 9; w >= 0; w--){
       let done = 0;

@@ -19,6 +19,7 @@ const App = (() => {
         target.classList.add('is-active');
 
         if (tab.dataset.view === 'dashboard') refreshDashboard();
+        if (tab.dataset.view === 'calendar') Calendar.render();
       });
     });
   }
@@ -56,7 +57,6 @@ const App = (() => {
 
   function refreshDashboard(){
     const habits = Habits.all;
-    const tasks = Tasks.all;
     const today = Store.todayStr();
 
     const c = Tasks.counts();
@@ -91,6 +91,7 @@ const App = (() => {
     setGreetingAndDate();
     setupNav();
     Tasks.init();
+    Calendar.init();
     Habits.init();
     refreshDashboard();
   }

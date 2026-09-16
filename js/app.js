@@ -93,6 +93,7 @@ const App = (() => {
     Tasks.init();
     Calendar.init();
     Habits.init();
+    Charts.init();
     refreshDashboard();
   }
 

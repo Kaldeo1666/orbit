@@ -100,9 +100,16 @@
         <div class="card card-panel">
           <div class="card-panel-head">
             <h2>Weekly rhythm</h2>
-            <p>Habit completions, last 7 days</p>
+            <p>Habit completions, last 7 days — click a bar for details</p>
           </div>
           <div class="chart-wrap"><canvas id="weeklyChart"></canvas></div>
+          <div class="chart-breakdown" id="weeklyBreakdown" hidden>
+            <div class="chart-breakdown-head">
+              <span class="chart-breakdown-date" id="weeklyBreakdownDate"></span>
+              <button type="button" class="chart-breakdown-close" id="weeklyBreakdownClose" aria-label="Close">×</button>
+            </div>
+            <div class="chart-breakdown-list" id="weeklyBreakdownList"></div>
+          </div>
         </div>
 
         <div class="card card-panel">
@@ -258,7 +265,11 @@
     <div><span id="drawerRate">0%</span><small>90-day rate</small></div>
   </div>
   <div class="heatmap-wrap">
-    <div class="heatmap" id="heatmap"></div>
+    <div class="heatmap-months" id="heatmapMonths"></div>
+    <div class="heatmap-body">
+      <div class="heatmap-weekdays" id="heatmapWeekdays"></div>
+      <div class="heatmap" id="heatmap"></div>
+    </div>
   </div>
   <div class="chart-wrap chart-wrap-small"><canvas id="habitTrendChart"></canvas></div>
   <button class="drawer-danger" id="drawerDelete">Delete this habit</button>

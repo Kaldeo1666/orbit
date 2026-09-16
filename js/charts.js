@@ -14,6 +14,42 @@ const Charts = (() => {
     return d.toLocaleDateString(undefined, { weekday: 'short' });
   }
 
+  function showWeeklyBreakdown(date){
+    const habits = Habits.all;
+    const doneHabits = habits.filter(h => h.log[date]);
+    const dateLabel = new Date(date + 'T00:00:00').toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' });
+
+    document.getElementById('weeklyBreakdownDate').textContent = dateLabel;
+    const list = document.getElementById('weeklyBreakdownList');
+    list.innerHTML = '';
+
+    if (doneHabits.length === 0){
+      const p = document.createElement('p');
+      p.className = 'chart-breakdown-empty';
+      p.textContent = 'No habits completed this day.';
+      list.appendChild(p);
+    } else {
+      doneHabits.forEach(h => {
+        const pill = document.createElement('span');
+        pill.className = 'chart-breakdown-pill';
+        pill.style.setProperty('--c', Habits.colorVar(h.color));
+        pill.textContent = h.name;
+        list.appendChild(pill);
+      });
+    }
+
+    const panel = document.getElementById('weeklyBreakdown');
+    panel.hidden = false;
+  }
+
+  function setupBreakdownClose(){
+    const closeBtn = document.getElementById('weeklyBreakdownClose');
+    if (!closeBtn) return;
+    closeBtn.addEventListener('click', () => {
+      document.getElementById('weeklyBreakdown').hidden = true;
+    });
+  }
+
   function renderWeekly(){
     const ctx = document.getElementById('weeklyChart');
     if (!ctx) return;
@@ -40,10 +76,17 @@ const Charts = (() => {
       },
       options: {
         animation: { duration: 700, easing: 'easeOutQuint' },
+        onClick: (evt, elements) => {
+          if (!elements.length) return;
+          showWeeklyBreakdown(days[elements[0].index]);
+        },
+        onHover: (evt, elements) => {
+          evt.native.target.style.cursor = elements.length ? 'pointer' : 'default';
+        },
         plugins: { legend: { display: false }, tooltip: {
           backgroundColor: '#131826', borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1,
           titleColor: '#EDEFF5', bodyColor: '#9AA1B4', padding: 10, cornerRadius: 10,
-          callbacks: { label: (ctx) => `${ctx.parsed.y} habit${ctx.parsed.y===1?'':'s'} completed` }
+          callbacks: { label: (ctx) => `${ctx.parsed.y} habit${ctx.parsed.y===1?'':'s'} completed — click for details` }
         }},
         scales: {
           x: { grid: { display: false }, border: { display:false } },
@@ -141,5 +184,9 @@ const Charts = (() => {
     renderQuadrant();
   }
 
-  return { renderAll, renderHabitTrend };
+  function init(){
+    setupBreakdownClose();
+  }
+
+  return { init, renderAll, renderHabitTrend };
 })();

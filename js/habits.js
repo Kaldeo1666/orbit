@@ -163,18 +163,48 @@ const Habits = (() => {
     document.getElementById('drawerBest').textContent = bestStreak(h);
     document.getElementById('drawerRate').textContent = rateOverDays(h, 90) + '%';
 
+    // 14 full weeks (Sun→Sat), ending on the Saturday of the current week —
+    // this makes the grid calendar-aligned so month/weekday labels line up.
+    const today = Store.todayStr();
+    const dow = new Date(today + 'T00:00:00').getDay(); // 0=Sun..6=Sat
+    const rangeEnd = addDays(today, 6 - dow);
+    const weeks = 14;
+    const rangeStart = addDays(rangeEnd, -(weeks * 7 - 1));
+
     const heatmap = document.getElementById('heatmap');
     heatmap.innerHTML = '';
-    const days = 98;
-    let cursor = addDays(Store.todayStr(), -(days - 1));
-    for (let i = 0; i < days; i++){
+    let cursor = rangeStart;
+    for (let i = 0; i < weeks * 7; i++){
       const dot = document.createElement('div');
-      const done = !!h.log[cursor];
-      dot.className = 'heat-dot' + (done ? ' lvl-2' : ' lvl-1');
-      dot.title = cursor + (done ? ' · done' : '');
+      const isFuture = cursor > today;
+      const done = !isFuture && !!h.log[cursor];
+      dot.className = 'heat-dot' + (isFuture ? ' is-future' : done ? ' lvl-2' : ' lvl-1');
+      if (!isFuture) dot.title = cursor + (done ? ' · done' : '');
       dot.style.background = done ? colorVar(h.color) : '';
       heatmap.appendChild(dot);
       cursor = addDays(cursor, 1);
+    }
+
+    // weekday labels (sparse — Mon/Wed/Fri only, GitHub-style)
+    const weekdayEl = document.getElementById('heatmapWeekdays');
+    weekdayEl.innerHTML = '';
+    ['', 'Mon', '', 'Wed', '', 'Fri', ''].forEach(label => {
+      const span = document.createElement('span');
+      span.textContent = label;
+      weekdayEl.appendChild(span);
+    });
+
+    // month labels — one per week-column, only where the month changes
+    const monthsEl = document.getElementById('heatmapMonths');
+    monthsEl.innerHTML = '';
+    let lastMonth = null;
+    for (let w = 0; w < weeks; w++){
+      const colDate = addDays(rangeStart, w * 7);
+      const m = new Date(colDate + 'T00:00:00').toLocaleDateString(undefined, { month: 'short' });
+      const span = document.createElement('span');
+      span.textContent = (m !== lastMonth) ? m : '';
+      monthsEl.appendChild(span);
+      lastMonth = m;
     }
 
     Charts.renderHabitTrend(h, colorVar(h.color));

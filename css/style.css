@@ -479,7 +479,7 @@ body{
 
 .cal2-chip{
   display:flex; align-items:center; gap:6px; padding:4px 8px; border-radius:20px;
-  background: color-mix(in srgb, var(--c, var(--teal)) 16%, transparent); border:1px solid var(--c, var(--teal));
+  background: color-mix(in srgb, var(--c, var(--teal)) 38%, var(--bg-2) 62%); border:1px solid var(--c, var(--teal));
   animation: pop-in .3s var(--ease-spring) both; position:relative;
 }
 .cal2-chip-check{
@@ -491,9 +491,14 @@ body{
 .cal2-chip.is-done .cal2-chip-check svg{ opacity:1; transform:scale(1); }
 .cal2-chip.is-done .cal2-chip-text{ text-decoration:line-through; color: var(--ink-faint); }
 .cal2-chip-text{ font-size:11.5px; font-weight:600; flex:1; min-width:0; }
-.cal2-chip-swatch{ width:11px; height:11px; border-radius:50%; background: var(--c, var(--teal)); border:none; cursor:pointer; flex-shrink:0; }
-.cal2-chip-del{ background:none; border:none; color: var(--ink-faint); cursor:pointer; font-size:13px; flex-shrink:0; opacity:0; transition: opacity .2s var(--ease); }
-.cal2-chip:hover .cal2-chip-del{ opacity:1; }
+.cal2-chip-toolbar{ display:flex; align-items:center; gap:4px; flex-shrink:0; opacity:0; transition: opacity .2s var(--ease); }
+.cal2-chip:hover .cal2-chip-toolbar{ opacity:1; }
+.cal2-chip-edit{
+  width:15px; height:15px; border-radius:50%; background: var(--bg-2); border:1px solid rgba(255,255,255,0.4);
+  cursor:pointer; flex-shrink:0; padding:0; display:flex; align-items:center; justify-content:center;
+}
+.cal2-chip-edit::after{ content:''; width:7px; height:7px; border-radius:50%; background: var(--c, var(--teal)); }
+.cal2-chip-del{ background:none; border:none; color: var(--ink-faint); cursor:pointer; font-size:13px; flex-shrink:0; }
 .cal2-chip-del:hover{ color: var(--rose); }
 
 .cal2-palette{
@@ -527,8 +532,9 @@ body{
 }
 
 .cal2-event{
-  position:absolute; border-radius: 8px; border-left: 3px solid var(--c, var(--teal));
-  background: color-mix(in srgb, var(--c, var(--teal)) 20%, var(--bg-2) 80%);
+  position:absolute; border-radius: 8px;
+  background: color-mix(in srgb, var(--c, var(--teal)) 55%, var(--bg-2) 45%);
+  border: 1px solid color-mix(in srgb, var(--c, var(--teal)) 70%, black 15%);
   padding:4px 8px; overflow:hidden; cursor:grab; touch-action:none;
   transition: box-shadow .2s var(--ease), opacity .2s var(--ease);
   animation: pop-in .3s var(--ease-spring) both;
@@ -539,13 +545,22 @@ body{
 .cal2-event.is-done .cal2-event-title{ text-decoration: line-through; }
 .cal2-event-inner{ display:flex; flex-direction:column; gap:1px; min-width:0; }
 .cal2-event-title{ font-weight:600; font-size:11.5px; line-height:1.25; color: var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.cal2-event-time{ font-family: var(--font-mono); font-size:9px; color: var(--c, var(--teal)); opacity:.9; white-space:nowrap; }
-.cal2-event-del{
-  position:absolute; top:2px; right:3px; background:none; border:none; color: var(--ink-faint);
-  cursor:pointer; font-size:13px; opacity:0; transition: opacity .2s var(--ease); line-height:1;
+.cal2-event-time{ font-family: var(--font-mono); font-size:9px; color: var(--ink); opacity:.85; white-space:nowrap; }
+.cal2-event-toolbar{
+  position:absolute; top:2px; right:3px; display:flex; align-items:center; gap:3px;
+  opacity:0; transition: opacity .2s var(--ease);
 }
-.cal2-event:hover .cal2-event-del{ opacity:1; }
-.cal2-event-del:hover{ color: var(--rose); }
+.cal2-event:hover .cal2-event-toolbar{ opacity:1; }
+.cal2-event-edit{
+  width:14px; height:14px; border-radius:50%; background: rgba(6,8,14,0.55); border:1px solid rgba(255,255,255,0.5);
+  cursor:pointer; padding:0; line-height:1; display:flex; align-items:center; justify-content:center;
+}
+.cal2-event-edit::after{ content:''; width:6px; height:6px; border-radius:50%; background: var(--c, var(--teal)); }
+.cal2-event-del{
+  background: rgba(6,8,14,0.55); border:1px solid rgba(255,255,255,0.3); border-radius:50%; width:14px; height:14px;
+  color: var(--ink); cursor:pointer; font-size:11px; line-height:1; padding:0;
+}
+.cal2-event-del:hover{ color: var(--rose); border-color: var(--rose); }
 
 /* ============================================================
    Habits

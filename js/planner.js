@@ -153,13 +153,16 @@ const Planner = (() => {
     el.style.left = `calc(${col*widthPct}% + 2px)`;
     el.style.width = `calc(${widthPct}% - 4px)`;
 
-    const showTime = height >= 30;
+    const showTime = height >= 16;
     el.innerHTML = `
       <div class="cal2-event-inner">
         <span class="cal2-event-title"></span>
         ${showTime ? `<span class="cal2-event-time">${fmt12(start)} – ${fmt12(end)}</span>` : ''}
       </div>
-      <button type="button" class="cal2-event-del" aria-label="Delete">×</button>
+      <div class="cal2-event-toolbar">
+        <button type="button" class="cal2-event-edit" aria-label="Change color"></button>
+        <button type="button" class="cal2-event-del" aria-label="Delete">×</button>
+      </div>
     `;
     el.querySelector('.cal2-event-title').textContent = item.text;
     el.title = `${item.text} · ${fmt12(start)}–${fmt12(end)}`;
@@ -168,11 +171,16 @@ const Planner = (() => {
       e.stopPropagation();
       remove(item.id);
     });
+    el.querySelector('.cal2-event-edit').addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.querySelectorAll('.cal2-palette').forEach(p => p.remove());
+      el.appendChild(buildPalettePopover(item, (c) => setColor(item.id, c)));
+    });
 
     // plain click = toggle done; drag (movement past threshold) = reschedule.
     let downX=0, downY=0, dragging=false, startMin=start;
     el.addEventListener('pointerdown', (e) => {
-      if (e.target.closest('.cal2-event-del')) return;
+      if (e.target.closest('.cal2-event-del') || e.target.closest('.cal2-event-edit') || e.target.closest('.cal2-palette')) return;
       downX = e.clientX; downY = e.clientY; dragging = false;
       el.setPointerCapture(e.pointerId);
       const onMove = (me) => {
@@ -216,8 +224,10 @@ const Planner = (() => {
     chip.innerHTML = `
       <span class="cal2-chip-check">${checkIcon}</span>
       <span class="cal2-chip-text"></span>
-      <button type="button" class="cal2-chip-swatch" aria-label="Change color"></button>
-      <button type="button" class="cal2-chip-del" aria-label="Delete">×</button>
+      <span class="cal2-chip-toolbar">
+        <button type="button" class="cal2-chip-edit" aria-label="Change color"></button>
+        <button type="button" class="cal2-chip-del" aria-label="Delete">×</button>
+      </span>
     `;
     chip.querySelector('.cal2-chip-text').textContent = item.text;
     chip.querySelector('.cal2-chip-check').addEventListener('click', (e) => {
@@ -226,7 +236,7 @@ const Planner = (() => {
     chip.querySelector('.cal2-chip-del').addEventListener('click', (e) => {
       e.stopPropagation(); remove(item.id);
     });
-    chip.querySelector('.cal2-chip-swatch').addEventListener('click', (e) => {
+    chip.querySelector('.cal2-chip-edit').addEventListener('click', (e) => {
       e.stopPropagation();
       document.querySelectorAll('.cal2-palette').forEach(p => p.remove());
       chip.appendChild(buildPalettePopover(item, (c) => setColor(item.id, c)));
@@ -373,7 +383,7 @@ const Planner = (() => {
 
   function init(){
     document.addEventListener('click', (e) => {
-      if (!e.target.closest('.cal2-chip-swatch')) {
+      if (!e.target.closest('.cal2-chip-edit') && !e.target.closest('.cal2-event-edit')) {
         document.querySelectorAll('.cal2-palette').forEach(p => p.remove());
       }
     });

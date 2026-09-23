@@ -434,87 +434,118 @@ body{
 .cal-tag-pick.is-active{ opacity:1; border-color: rgba(255,255,255,0.55); transform: scale(1.15); }
 
 /* ============================================================
-   Planner (freeform next-7-days schedule)
+   Planner (Google-Calendar-style hour grid)
    ============================================================ */
-.plan-grid{
-  display:grid; grid-auto-flow: column; grid-auto-columns: minmax(216px, 1fr);
-  gap:14px; overflow-x:auto; padding-bottom:10px;
-}
-.plan-day{
-  background: var(--surface); border:1px solid var(--border); border-radius: var(--r-lg);
-  padding:16px; display:flex; flex-direction:column; min-height:340px;
-  transition: border-color .25s var(--ease), background .25s var(--ease);
-  animation: rise .4s var(--ease) both;
-}
-.plan-day.is-today{ border-color: var(--teal); background: var(--teal-dim); }
-.plan-day-head{ display:flex; align-items:baseline; gap:8px; margin-bottom:14px; }
-.plan-day-name{ font-family: var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:.08em; color: var(--ink-faint); }
-.plan-day.is-today .plan-day-name{ color: var(--teal); }
-.plan-day-num{ font-family: var(--font-display); font-size:20px; font-weight:600; }
+.cal2-outer{ overflow-x:auto; border:1px solid var(--border); border-radius: var(--r-lg); background: var(--surface); }
+.cal2-inner{ min-width: 760px; }
 
-.plan-day-list{
-  list-style:none; display:flex; flex-direction:column; gap:8px; flex:1; min-height:50px;
-  border-radius: var(--r-sm); transition: background .2s var(--ease);
+.cal2-header{ display:flex; border-bottom: 1px solid var(--border); }
+.cal2-gutter-spacer{ width:46px; flex-shrink:0; }
+.cal2-day-header{
+  flex:1; min-width:100px; padding:10px 12px; text-align:center; position:relative;
+  border-left: 1px solid var(--border);
 }
-.plan-day-list.is-dragover{ background: rgba(255,255,255,0.03); outline: 1px dashed var(--border-hi); }
-.plan-day-empty{ font-size:11.5px; color: var(--ink-faint); font-style:italic; padding: 6px 2px; }
+.cal2-day-header.is-today{ background: var(--teal-dim); }
+.cal2-day-name{ display:block; font-family: var(--font-mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; color: var(--ink-faint); }
+.cal2-day-header.is-today .cal2-day-name{ color: var(--teal); }
+.cal2-day-num{ display:block; font-family: var(--font-display); font-size:18px; font-weight:600; margin-top:2px; }
+.cal2-add-btn{
+  position:absolute; top:8px; right:8px; width:20px; height:20px; border-radius:50%;
+  background: var(--surface-hi); border:1px solid var(--border); color: var(--ink-dim);
+  font-size:13px; line-height:1; cursor:pointer; transition: all .2s var(--ease);
+}
+.cal2-add-btn:hover{ color: var(--teal); border-color: var(--teal); }
 
-.plan-card{
-  border-radius: var(--r-sm); border: 1px solid var(--border); border-left: 3px solid var(--c, var(--teal));
-  background: rgba(255,255,255,0.03); padding: 9px 10px; cursor:grab; user-select:none;
-  animation: pop-in .35s var(--ease-spring) both;
-  transition: border-color .2s var(--ease), background .2s var(--ease), opacity .3s var(--ease), transform .3s var(--ease);
+.cal2-addform-cell{ flex:1; min-width:100px; border-left:1px solid var(--border); padding:8px; }
+.cal2-addform{ display:flex; flex-direction:column; gap:6px; animation: rise .3s var(--ease) both; }
+.cal2-add-text{
+  background: rgba(255,255,255,0.04); border:1px solid var(--border); border-radius: var(--r-sm);
+  padding:6px 9px; color: var(--ink); font-family: var(--font-body); font-size:12px;
 }
-.plan-card:hover{ background: rgba(255,255,255,0.05); }
-.plan-card.is-dragging{ opacity:.4; }
-.plan-card.is-removing{ opacity:0; transform: translateX(30px) scale(.9); }
-.plan-card-row{ display:flex; align-items:flex-start; gap:8px; }
+.cal2-add-text:focus{ outline:none; border-color: var(--teal); }
+.cal2-add-row{ display:flex; gap:5px; }
+.cal2-add-time, .cal2-add-duration{
+  background: rgba(255,255,255,0.04); border:1px solid var(--border); border-radius: var(--r-sm);
+  padding:5px 6px; color: var(--ink); font-family: var(--font-body); font-size:10.5px; color-scheme:dark; flex:1; min-width:0;
+}
+.cal2-add-submit{
+  background: var(--teal); color:#06231D; border:none; border-radius: var(--r-sm);
+  padding:6px; font-weight:600; font-size:11.5px; cursor:pointer; transition: transform .18s var(--ease-spring);
+}
+.cal2-add-submit:hover{ transform: translateY(-1px); }
 
-.plan-check{
-  width:18px; height:18px; border-radius:6px; border:1.5px solid var(--ink-faint); flex-shrink:0; margin-top:1px;
-  display:flex; align-items:center; justify-content:center; cursor:pointer; transition: all .2s var(--ease-spring);
-}
-.plan-check svg{ width:11px; height:11px; opacity:0; transform: scale(.5); transition: all .18s var(--ease-spring); stroke:#06231D; }
-.plan-card.is-done .plan-check{ background: var(--c, var(--teal)); border-color: var(--c, var(--teal)); }
-.plan-card.is-done .plan-check svg{ opacity:1; transform: scale(1); }
-.plan-card.is-done .plan-text{ text-decoration: line-through; color: var(--ink-faint); }
+.cal2-allday{ display:flex; border-bottom: 1px solid var(--border); min-height:8px; }
+.cal2-allday-col{ flex:1; min-width:100px; border-left:1px solid var(--border); padding:6px 8px; display:flex; flex-direction:column; gap:5px; }
 
-.plan-card-main{ flex:1; min-width:0; display:flex; flex-direction:column; gap:3px; padding-top:1px; }
-.plan-text{ font-weight:600; font-size:13px; line-height:1.35; word-break:break-word; }
-.plan-time{ font-family: var(--font-mono); font-size:9.5px; color: var(--c, var(--teal)); opacity:.9; }
+.cal2-chip{
+  display:flex; align-items:center; gap:6px; padding:4px 8px; border-radius:20px;
+  background: color-mix(in srgb, var(--c, var(--teal)) 16%, transparent); border:1px solid var(--c, var(--teal));
+  animation: pop-in .3s var(--ease-spring) both; position:relative;
+}
+.cal2-chip-check{
+  width:13px; height:13px; border-radius:4px; border:1.5px solid var(--c, var(--teal)); flex-shrink:0;
+  display:flex; align-items:center; justify-content:center; cursor:pointer;
+}
+.cal2-chip-check svg{ width:8px; height:8px; opacity:0; transform:scale(.5); transition: all .18s var(--ease-spring); stroke:#06231D; }
+.cal2-chip.is-done .cal2-chip-check{ background: var(--c, var(--teal)); }
+.cal2-chip.is-done .cal2-chip-check svg{ opacity:1; transform:scale(1); }
+.cal2-chip.is-done .cal2-chip-text{ text-decoration:line-through; color: var(--ink-faint); }
+.cal2-chip-text{ font-size:11.5px; font-weight:600; flex:1; min-width:0; }
+.cal2-chip-swatch{ width:11px; height:11px; border-radius:50%; background: var(--c, var(--teal)); border:none; cursor:pointer; flex-shrink:0; }
+.cal2-chip-del{ background:none; border:none; color: var(--ink-faint); cursor:pointer; font-size:13px; flex-shrink:0; opacity:0; transition: opacity .2s var(--ease); }
+.cal2-chip:hover .cal2-chip-del{ opacity:1; }
+.cal2-chip-del:hover{ color: var(--rose); }
 
-.plan-swatch{
-  width:14px; height:14px; border-radius:50%; background: var(--c, var(--teal));
-  border:1.5px solid rgba(255,255,255,0.3); flex-shrink:0; cursor:pointer; margin-top:3px;
-  transition: transform .2s var(--ease-spring);
+.cal2-palette{
+  position:absolute; top:100%; left:0; margin-top:6px; z-index:10;
+  display:flex; flex-wrap:wrap; gap:6px; width:110px; padding:8px;
+  background: var(--bg-2); border:1px solid var(--border-hi); border-radius: var(--r-sm);
+  box-shadow: 0 10px 24px -8px rgba(0,0,0,0.5); animation: pop-in .2s var(--ease-spring) both;
 }
-.plan-swatch:hover{ transform: scale(1.2); }
-.plan-del{ background:none; border:none; color: var(--ink-faint); cursor:pointer; font-size:15px; opacity:0; transition: opacity .2s var(--ease); flex-shrink:0; }
-.plan-card:hover .plan-del{ opacity:1; }
-.plan-del:hover{ color: var(--rose); }
+.cal2-palette-dot{ width:16px; height:16px; border-radius:50%; background: var(--c); border:2px solid transparent; cursor:pointer; opacity:.6; transition: all .2s var(--ease-spring); }
+.cal2-palette-dot:hover{ opacity:.9; transform: scale(1.1); }
+.cal2-palette-dot.is-active{ opacity:1; border-color: rgba(255,255,255,0.6); transform: scale(1.15); }
 
-.plan-palette{ display:flex; flex-wrap:wrap; gap:6px; margin-top:9px; padding-top:9px; border-top:1px dashed var(--border); }
-.plan-palette-dot{
-  width:16px; height:16px; border-radius:50%; background: var(--c); border:2px solid transparent;
-  cursor:pointer; opacity:.55; transition: all .2s var(--ease-spring);
+.cal2-scroll{ max-height:560px; overflow-y:auto; position:relative; }
+.cal2-body{ display:flex; position:relative; }
+.cal2-gutter{ width:46px; flex-shrink:0; position:relative; }
+.cal2-hour-label{
+  position:absolute; left:0; right:6px; transform: translateY(-6px); text-align:right;
+  font-family: var(--font-mono); font-size:9.5px; color: var(--ink-faint);
 }
-.plan-palette-dot:hover{ opacity:.85; transform: scale(1.1); }
-.plan-palette-dot.is-active{ opacity:1; border-color: rgba(255,255,255,0.6); transform: scale(1.15); }
+.cal2-day-col{
+  flex:1; min-width:100px; position:relative; border-left:1px solid var(--border);
+  background-image: repeating-linear-gradient(to bottom, transparent 0, transparent calc(100% - 1px), var(--border) 100%);
+}
+.cal2-day-col.is-today{ background-color: rgba(94,234,212,0.03); }
 
-.plan-quickadd{ margin-top:12px; padding-top:12px; border-top: 1px dashed var(--border); display:flex; gap:6px; }
-.plan-quickadd-input{
-  flex:1; min-width:0; background: rgba(255,255,255,0.03); border:1px solid var(--border); border-radius: var(--r-sm);
-  padding: 8px 11px; color: var(--ink); font-family: var(--font-body); font-size:12.5px;
-  transition: border-color .2s var(--ease), background .2s var(--ease);
+.cal2-now-line{
+  position:absolute; left:0; right:0; height:2px; background: var(--rose); z-index:5; pointer-events:none;
 }
-.plan-quickadd-input::placeholder{ color: var(--ink-faint); }
-.plan-quickadd-input:focus{ outline:none; border-color: var(--teal); background: var(--surface-hi); }
-.plan-quickadd-time{
-  background: rgba(255,255,255,0.03); border:1px solid var(--border); border-radius: var(--r-sm);
-  padding: 7px 8px; color: var(--ink); font-family: var(--font-body); font-size:11px; width:90px;
-  flex-shrink:0; color-scheme: dark;
+.cal2-now-line::before{
+  content:''; position:absolute; left:-4px; top:-3px; width:8px; height:8px; border-radius:50%; background: var(--rose);
 }
-.plan-quickadd-time:focus{ outline:none; border-color: var(--teal); }
+
+.cal2-event{
+  position:absolute; border-radius: 8px; border-left: 3px solid var(--c, var(--teal));
+  background: color-mix(in srgb, var(--c, var(--teal)) 20%, var(--bg-2) 80%);
+  padding:4px 8px; overflow:hidden; cursor:grab; touch-action:none;
+  transition: box-shadow .2s var(--ease), opacity .2s var(--ease);
+  animation: pop-in .3s var(--ease-spring) both;
+}
+.cal2-event:hover{ box-shadow: 0 4px 14px -4px rgba(0,0,0,0.5); z-index:2; }
+.cal2-event.is-dragging{ opacity:.85; box-shadow: 0 12px 28px -8px rgba(0,0,0,0.6); cursor:grabbing; }
+.cal2-event.is-done{ opacity:.55; }
+.cal2-event.is-done .cal2-event-title{ text-decoration: line-through; }
+.cal2-event-inner{ display:flex; flex-direction:column; gap:1px; min-width:0; }
+.cal2-event-title{ font-weight:600; font-size:11.5px; line-height:1.25; color: var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.cal2-event-time{ font-family: var(--font-mono); font-size:9px; color: var(--c, var(--teal)); opacity:.9; white-space:nowrap; }
+.cal2-event-del{
+  position:absolute; top:2px; right:3px; background:none; border:none; color: var(--ink-faint);
+  cursor:pointer; font-size:13px; opacity:0; transition: opacity .2s var(--ease); line-height:1;
+}
+.cal2-event:hover .cal2-event-del{ opacity:1; }
+.cal2-event-del:hover{ color: var(--rose); }
 
 /* ============================================================
    Habits
@@ -638,5 +669,5 @@ body{
   .habit-row{ grid-template-columns: auto 1fr auto; }
   .habit-spark{ display:none; }
   .cal-grid{ grid-auto-columns: minmax(260px, 82vw); }
-  .plan-grid{ grid-auto-columns: minmax(260px, 82vw); }
+  .cal2-inner{ min-width: 600px; }
 }

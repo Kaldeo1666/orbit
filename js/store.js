@@ -5,6 +5,7 @@ const Store = (() => {
   const TASKS_KEY = 'orbit.tasks.v1';
   const HABITS_KEY = 'orbit.habits.v1';
   const CAL_ANCHOR_KEY = 'orbit.calendarAnchor.v1';
+  const PLANNER_KEY = 'orbit.planner.v1';
 
   function read(key, fallback){
     try{
@@ -55,5 +56,7 @@ const Store = (() => {
     setHabits: (h) => write(HABITS_KEY, h),
     getCalAnchor: () => read(CAL_ANCHOR_KEY, null),
     setCalAnchor: (d) => write(CAL_ANCHOR_KEY, d),
+    getPlanner: () => read(PLANNER_KEY, []),
+    setPlanner: (p) => write(PLANNER_KEY, p),
   };
 })();

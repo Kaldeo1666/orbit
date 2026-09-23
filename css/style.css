@@ -434,6 +434,89 @@ body{
 .cal-tag-pick.is-active{ opacity:1; border-color: rgba(255,255,255,0.55); transform: scale(1.15); }
 
 /* ============================================================
+   Planner (freeform next-7-days schedule)
+   ============================================================ */
+.plan-grid{
+  display:grid; grid-auto-flow: column; grid-auto-columns: minmax(216px, 1fr);
+  gap:14px; overflow-x:auto; padding-bottom:10px;
+}
+.plan-day{
+  background: var(--surface); border:1px solid var(--border); border-radius: var(--r-lg);
+  padding:16px; display:flex; flex-direction:column; min-height:340px;
+  transition: border-color .25s var(--ease), background .25s var(--ease);
+  animation: rise .4s var(--ease) both;
+}
+.plan-day.is-today{ border-color: var(--teal); background: var(--teal-dim); }
+.plan-day-head{ display:flex; align-items:baseline; gap:8px; margin-bottom:14px; }
+.plan-day-name{ font-family: var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:.08em; color: var(--ink-faint); }
+.plan-day.is-today .plan-day-name{ color: var(--teal); }
+.plan-day-num{ font-family: var(--font-display); font-size:20px; font-weight:600; }
+
+.plan-day-list{
+  list-style:none; display:flex; flex-direction:column; gap:8px; flex:1; min-height:50px;
+  border-radius: var(--r-sm); transition: background .2s var(--ease);
+}
+.plan-day-list.is-dragover{ background: rgba(255,255,255,0.03); outline: 1px dashed var(--border-hi); }
+.plan-day-empty{ font-size:11.5px; color: var(--ink-faint); font-style:italic; padding: 6px 2px; }
+
+.plan-card{
+  border-radius: var(--r-sm); border: 1px solid var(--border); border-left: 3px solid var(--c, var(--teal));
+  background: rgba(255,255,255,0.03); padding: 9px 10px; cursor:grab; user-select:none;
+  animation: pop-in .35s var(--ease-spring) both;
+  transition: border-color .2s var(--ease), background .2s var(--ease), opacity .3s var(--ease), transform .3s var(--ease);
+}
+.plan-card:hover{ background: rgba(255,255,255,0.05); }
+.plan-card.is-dragging{ opacity:.4; }
+.plan-card.is-removing{ opacity:0; transform: translateX(30px) scale(.9); }
+.plan-card-row{ display:flex; align-items:flex-start; gap:8px; }
+
+.plan-check{
+  width:18px; height:18px; border-radius:6px; border:1.5px solid var(--ink-faint); flex-shrink:0; margin-top:1px;
+  display:flex; align-items:center; justify-content:center; cursor:pointer; transition: all .2s var(--ease-spring);
+}
+.plan-check svg{ width:11px; height:11px; opacity:0; transform: scale(.5); transition: all .18s var(--ease-spring); stroke:#06231D; }
+.plan-card.is-done .plan-check{ background: var(--c, var(--teal)); border-color: var(--c, var(--teal)); }
+.plan-card.is-done .plan-check svg{ opacity:1; transform: scale(1); }
+.plan-card.is-done .plan-text{ text-decoration: line-through; color: var(--ink-faint); }
+
+.plan-card-main{ flex:1; min-width:0; display:flex; flex-direction:column; gap:3px; padding-top:1px; }
+.plan-text{ font-weight:600; font-size:13px; line-height:1.35; word-break:break-word; }
+.plan-time{ font-family: var(--font-mono); font-size:9.5px; color: var(--c, var(--teal)); opacity:.9; }
+
+.plan-swatch{
+  width:14px; height:14px; border-radius:50%; background: var(--c, var(--teal));
+  border:1.5px solid rgba(255,255,255,0.3); flex-shrink:0; cursor:pointer; margin-top:3px;
+  transition: transform .2s var(--ease-spring);
+}
+.plan-swatch:hover{ transform: scale(1.2); }
+.plan-del{ background:none; border:none; color: var(--ink-faint); cursor:pointer; font-size:15px; opacity:0; transition: opacity .2s var(--ease); flex-shrink:0; }
+.plan-card:hover .plan-del{ opacity:1; }
+.plan-del:hover{ color: var(--rose); }
+
+.plan-palette{ display:flex; flex-wrap:wrap; gap:6px; margin-top:9px; padding-top:9px; border-top:1px dashed var(--border); }
+.plan-palette-dot{
+  width:16px; height:16px; border-radius:50%; background: var(--c); border:2px solid transparent;
+  cursor:pointer; opacity:.55; transition: all .2s var(--ease-spring);
+}
+.plan-palette-dot:hover{ opacity:.85; transform: scale(1.1); }
+.plan-palette-dot.is-active{ opacity:1; border-color: rgba(255,255,255,0.6); transform: scale(1.15); }
+
+.plan-quickadd{ margin-top:12px; padding-top:12px; border-top: 1px dashed var(--border); display:flex; gap:6px; }
+.plan-quickadd-input{
+  flex:1; min-width:0; background: rgba(255,255,255,0.03); border:1px solid var(--border); border-radius: var(--r-sm);
+  padding: 8px 11px; color: var(--ink); font-family: var(--font-body); font-size:12.5px;
+  transition: border-color .2s var(--ease), background .2s var(--ease);
+}
+.plan-quickadd-input::placeholder{ color: var(--ink-faint); }
+.plan-quickadd-input:focus{ outline:none; border-color: var(--teal); background: var(--surface-hi); }
+.plan-quickadd-time{
+  background: rgba(255,255,255,0.03); border:1px solid var(--border); border-radius: var(--r-sm);
+  padding: 7px 8px; color: var(--ink); font-family: var(--font-body); font-size:11px; width:90px;
+  flex-shrink:0; color-scheme: dark;
+}
+.plan-quickadd-time:focus{ outline:none; border-color: var(--teal); }
+
+/* ============================================================
    Habits
    ============================================================ */
 .habit-list{ display:flex; flex-direction:column; gap:10px; }
@@ -555,4 +638,5 @@ body{
   .habit-row{ grid-template-columns: auto 1fr auto; }
   .habit-spark{ display:none; }
   .cal-grid{ grid-auto-columns: minmax(260px, 82vw); }
+  .plan-grid{ grid-auto-columns: minmax(260px, 82vw); }
 }

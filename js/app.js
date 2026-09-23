@@ -20,6 +20,7 @@ const App = (() => {
 
         if (tab.dataset.view === 'dashboard') refreshDashboard();
         if (tab.dataset.view === 'calendar') Calendar.render();
+        if (tab.dataset.view === 'planner') Planner.render();
       });
     });
   }
@@ -92,6 +93,7 @@ const App = (() => {
     setupNav();
     Tasks.init();
     Calendar.init();
+    Planner.init();
     Habits.init();
     Charts.init();
     refreshDashboard();

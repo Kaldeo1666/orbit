@@ -49,6 +49,10 @@
         <span class="rail-tab-icon">▦</span>
         <span class="rail-tab-label">Calendar</span>
       </button>
+      <button class="rail-tab" data-view="planner" role="tab" aria-selected="false">
+        <span class="rail-tab-icon">◫</span>
+        <span class="rail-tab-label">Planner</span>
+      </button>
       <button class="rail-tab" data-view="habits" role="tab" aria-selected="false">
         <span class="rail-tab-icon">◉</span>
         <span class="rail-tab-label">Habits</span>
@@ -223,6 +227,18 @@
       <div class="cal-grid" id="calGrid"></div>
     </section>
 
+    <!-- ============ PLANNER ============ -->
+    <section class="view" id="view-planner" data-view-panel="planner">
+      <header class="stage-head">
+        <div>
+          <p class="stage-eyebrow">Planner</p>
+          <h1 class="stage-title">Plan the week ahead.</h1>
+        </div>
+      </header>
+
+      <div class="plan-grid" id="planGrid"></div>
+    </section>
+
     <!-- ============ HABITS ============ -->
     <section class="view" id="view-habits" data-view-panel="habits">
       <header class="stage-head">
@@ -282,6 +298,7 @@
 <script src="js/store.js"></script>
 <script src="js/tasks.js"></script>
 <script src="js/calendar.js"></script>
+<script src="js/planner.js"></script>
 <script src="js/habits.js"></script>
 <script src="js/charts.js"></script>
 <script src="js/app.js"></script>
